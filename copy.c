@@ -199,7 +199,7 @@ void check_paths(char* input_path, char * output_path){
 FILE * open_file(char * path, char * options){
 	FILE * f = fopen(path, options);
 	if (f == NULL) {
-		printf("Error: No existe el fichero %s.\n", path);
+		printf("Error: No hay acceso al fichero %s.\n", path);
 		exit(-1);
 	}
 	return f;
@@ -271,13 +271,14 @@ void copy_dir_to_dir(char * input, char * output){
 	}
 
 		strcpy (path_input_b, input);
-
+		if(opc.opt_v) printf("%s\t --> ", path_input_b);
 		strcpy (path_output_b, output);
 		strcat (path_output_b, "/");
 		strcat (path_output_b, basename(input));
 
 		mkdir(path_output_b, 0777);
 		copy_perm(input, path_output_b);
+		if(opc.opt_v) printf("%s\n", path_output_b);
 
 	while ((inside_origen = readdir (dir_origen)) != NULL) {
 		char * origen_file = inside_origen -> d_name;
@@ -393,6 +394,7 @@ int main(int argc, char *argv[])
 
 	get_args(argc, argv);
 	copy(&inputFiles.array[0], inputFiles.numFiles, outputFile);
+	printf("Bytes copiados: %d\n", copiedBytes);
 
 
 }
