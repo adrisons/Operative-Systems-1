@@ -1,4 +1,4 @@
 Operative-Systems-1
 ===================
-
-Copy
+Author: Adrián Pereira Guerra
+login: adrian.pereira
