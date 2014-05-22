@@ -87,7 +87,7 @@ void copy_perm(char *input, char *output){
 	struct stat info;
 	if (lstat(input, &info) == -1){
 		printf ("Error: No se han podido coger los permisos de %s\n", input);
-		exit(13);
+		exit(03);
 	}
 	chmod(output, info.st_mode);
 
@@ -113,7 +113,7 @@ int get_path_type(char* target){
 		}
 		else{
 			printf("Error: Path incorrecto %s.\n",target);
-			exit(3);
+			exit(0);
 		}
 	}
 
@@ -146,7 +146,7 @@ int check_opt_t(char * o){
 		
 		if( (stat(o, &info)) != 0){
 			printf("Error: Al usar stat sobre el fichero %s.\n", o);
-			exit(-10);
+			exit(00);
 		}
 		int tam_o = info.st_size;
 		if (tam_o > opc.numBytes){
@@ -173,14 +173,14 @@ void check_paths(char* input_path, char * output_path){
 
 	if(strcmp(input_path,output_path) == 0){
 		printf("Error: Las rutas origen y destino no pueden ser la misma.\n");
-		exit(12);
+		exit(02);
 	}
 
 	int orig_type = get_path_type(input_path);
 	
 	if((orig_type == 1) && (!opc.opt_R)){// Si el path origen es un directorio debe estar especificada la opción -R
 			printf("Error: Para copiar directorios debe estar activada la opción -R.\n");
-			exit(11);
+			exit(01);
 	}
 	// Si el fichero ya existe tiene que estar indicada la opción -f para sobrescribir
 	else if ( (orig_type == 2 || orig_type == 3) && (!opc.opt_f) ) {
@@ -200,7 +200,7 @@ FILE * open_file(char * path, char * options){
 	FILE * f = fopen(path, options);
 	if (f == NULL) {
 		printf("Error: No hay acceso al fichero %s.\n", path);
-		exit(-1);
+		exit(0);
 	}
 	return f;
 }
@@ -267,14 +267,13 @@ void copy_dir_to_dir(char * input, char * output){
 
 	if ((dir_origen = opendir (input)) == NULL) {
 		printf("Error: No se ha podido abrir %s\n", input);
-		exit(13);
+		exit(03);
 	}
 
 		strcpy (path_input_b, input);
 		if(opc.opt_v) printf("%s\t --> ", path_input_b);
-		strcpy (path_output_b, output);
-		strcat (path_output_b, "/");
-		strcat (path_output_b, basename(input));
+		
+		sprintf(path_output_b,"%s/%s", path_output, basename(input));
 
 		mkdir(path_output_b, 0777);
 		copy_perm(input, path_output_b);
@@ -285,13 +284,9 @@ void copy_dir_to_dir(char * input, char * output){
 
   		if (origen_file[0] == '.') {continue;} // Se ignoran los archivos ocultos como . o ..
 
-		strcpy (path_output, path_output_b);
-		strcat (path_output, "/");
-		strcat (path_output, origen_file);
-		
-		strcpy (path_input, path_input_b);
-		strcat (path_input, "/");
-		strcat (path_input, origen_file);
+		sprintf(path_output,"%s/%s", path_output_b, origen_file);
+		sprintf(path_input,"%s/%s", path_input_b, origen_file);
+
 
 		int file_type = get_path_type(path_input);
 		switch(file_type)
@@ -303,6 +298,10 @@ void copy_dir_to_dir(char * input, char * output){
 			default: break;
 		}
   	}
+  	free(path_input);
+	free(path_input_b);
+	free(path_output);
+  	free(path_output_b);
 	closedir(dir_origen);
 }
 
@@ -320,15 +319,14 @@ void copy(char* array_input[MAX_ELEMENTOS], int num_files_in, char * output)
 			copy_dir_to_dir(input, output);
 		}
 		else { // El origen es un fichero
-			if(dest_type == 1){
+			if(dest_type == 1){ // El destino es un directorio
 				char * path_output = (char *) malloc (1000 *sizeof (char));
-				strcpy (path_output, output);
-				strcat (path_output, "/");
-				strcat (path_output, basename(input));
+
+				sprintf(path_output,"%s/%s", output, basename(input));
 				copy_file_to_file(input, path_output);
 				free(path_output);
 			}
-			else if (dest_type == 2){
+			else if (dest_type == 2){ // El destino es un fichero
 				copy_file_to_file(input, output);
 			}
 		}
@@ -351,7 +349,7 @@ void get_args(int argc, char *argv[]){
 		if (starts_with("-", argi)){
 			if (strlen(argi) > 2) {
 				printf("Error: Opción no válida");
-				exit(1);
+				exit(0);
 			}
 			option = argi[1];
 			switch(option){
@@ -362,7 +360,7 @@ void get_args(int argc, char *argv[]){
 					break;
 				case 'f': opc.opt_f = 1; break;
 				case 'v': opc.opt_v = 1; break;
-				default: printf("Error: Opción no reconocida \"-%c\"\n", option); exit(1);
+				default: printf("Error: Opción no reconocida \"-%c\"\n", option); exit(0);
 			}
 		}
 		// RUTAS ORIGEN
@@ -374,7 +372,7 @@ void get_args(int argc, char *argv[]){
 	}
 	if(inputFiles.numFiles == 0){
 		printf("Error: Es necesario especificar un origen a copiar.\n");
-		exit(13);
+		exit(03);
 	}
 }
 
