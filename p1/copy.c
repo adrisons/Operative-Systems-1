@@ -87,7 +87,7 @@ void copy_perm(char *input, char *output){
 	struct stat info;
 	if (lstat(input, &info) == -1){
 		printf ("Error: No se han podido coger los permisos de %s\n", input);
-		exit(03);
+		exit(0);
 	}
 	chmod(output, info.st_mode);
 
@@ -146,7 +146,7 @@ int check_opt_t(char * o){
 		
 		if( (stat(o, &info)) != 0){
 			printf("Error: Al usar stat sobre el fichero %s.\n", o);
-			exit(00);
+			exit(0);
 		}
 		int tam_o = info.st_size;
 		if (tam_o > opc.numBytes){
@@ -173,14 +173,14 @@ void check_paths(char* input_path, char * output_path){
 
 	if(strcmp(input_path,output_path) == 0){
 		printf("Error: Las rutas origen y destino no pueden ser la misma.\n");
-		exit(02);
+		exit(0);
 	}
 
 	int orig_type = get_path_type(input_path);
 	
 	if((orig_type == 1) && (!opc.opt_R)){// Si el path origen es un directorio debe estar especificada la opción -R
 			printf("Error: Para copiar directorios debe estar activada la opción -R.\n");
-			exit(01);
+			exit(0);
 	}
 	// Si el fichero ya existe tiene que estar indicada la opción -f para sobrescribir
 	else if ( (orig_type == 2 || orig_type == 3) && (!opc.opt_f) ) {
@@ -188,6 +188,7 @@ void check_paths(char* input_path, char * output_path){
 		if( file != NULL ){
 			printf("Error: Ya existe %s. Para sobrescribir archivos debe estar la opción -f activada.\n", output_path);
 			fclose(file);
+			exit(0);
 		}			
 	}
 }
@@ -267,7 +268,7 @@ void copy_dir_to_dir(char * input, char * output){
 
 	if ((dir_origen = opendir (input)) == NULL) {
 		printf("Error: No se ha podido abrir %s\n", input);
-		exit(03);
+		exit(0);
 	}
 
 		strcpy (path_input_b, input);
@@ -372,7 +373,7 @@ void get_args(int argc, char *argv[]){
 	}
 	if(inputFiles.numFiles == 0){
 		printf("Error: Es necesario especificar un origen a copiar.\n");
-		exit(03);
+		exit(0);
 	}
 }
 
