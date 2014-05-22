@@ -2,7 +2,7 @@
 CC = gcc
 
 #Definiendo las opciones de compilacion
-CFLAGS= -Wall -O0 -g
+CFLAGS= -Wall -O0 -g -std=gnu99
 
 default: compile
 

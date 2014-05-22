@@ -22,6 +22,7 @@ OPCIONES:
 #include <libgen.h>
 
 #define MAX_ELEMENTOS 15
+//#define PATH_MAX 250
 
 typedef struct {
 	char* array[MAX_ELEMENTOS];
@@ -201,7 +202,7 @@ FILE * open_file(char * path, char * options){
 	FILE * f = fopen(path, options);
 	if (f == NULL) {
 		printf("Error: No hay acceso al fichero %s.\n", path);
-		exit(-1);
+		exit(1);
 	}
 	return f;
 }
@@ -213,8 +214,9 @@ FILE * open_file(char * path, char * options){
 void copy_file_to_file (char * input_path, char * output_path){
 	FILE *inputFile, *outputFile;
 	char buffer[2048];
+	char * error_buff;
 	int bytesToCopy;
-	char * input_real_path;
+	char * input_real_path=(char *) malloc(300 * sizeof(char));
 
 	check_paths(input_path, output_path);
 
@@ -227,7 +229,14 @@ void copy_file_to_file (char * input_path, char * output_path){
 	if(opc.opt_v) printf("%s\t --> ", input_path);
 	
 	int path_type = get_path_type(input_path);
-	input_real_path = realpath (input_path, NULL); // Se obtiene al fichero al que apunta el link
+
+	error_buff = realpath (input_path, input_real_path); // Se obtiene al fichero al que apunta el link. realpath reserva memoria para su resultado.
+	if(error_buff == NULL){
+		printf("Error: al resolver realpath(%s)\n",input_path);
+		free(error_buff);
+		exit(0);
+	}
+	
 	if ((path_type == 3) && (opc.opt_R)){// Si la entrada es un link // Si está activada la opción -R se copia el enlace
 		symlink (input_real_path, output_path);
 	}
@@ -246,7 +255,7 @@ void copy_file_to_file (char * input_path, char * output_path){
 		fclose(inputFile);
 		fclose(outputFile);
 	}
-
+	free(input_real_path);
 	copy_perm(input_path, output_path);
 	if(opc.opt_v) printf("%s\n", output_path);
 
@@ -259,10 +268,10 @@ void copy_dir_to_dir(char * input, char * output){
 	DIR * dir_origen;
 	struct dirent * inside_origen;
 	
-	char  path_input [250];//= (char *) malloc (1000 *sizeof (char));
-	char  path_input_b [250];//= (char *) malloc (1000 *sizeof (char)); // path carpeta origen
-	char  path_output [250];//= (char *) malloc (1000 *sizeof (char));
-	char  path_output_b [250];//= (char *) malloc (1000 *sizeof (char)); // path de la carpeta creada en el destino
+	char  path_input [PATH_MAX];//= (char *) malloc (1000 *sizeof (char));
+	char  path_input_b [PATH_MAX];//= (char *) malloc (1000 *sizeof (char)); // path carpeta origen
+	char  path_output [PATH_MAX];//= (char *) malloc (1000 *sizeof (char));
+	char  path_output_b [PATH_MAX];//= (char *) malloc (1000 *sizeof (char)); // path de la carpeta creada en el destino
 
 	check_paths(input, output);
 
@@ -271,14 +280,12 @@ void copy_dir_to_dir(char * input, char * output){
 		exit(0);
 	}
 
-		printf("input:%s\n", input);
-		printf("output:%s\n", output);
 		strcpy (path_input_b, input);
 		if(opc.opt_v) printf("%s\t --> ", path_input_b);
 		strcpy (path_output_b, output);
 		strcat (path_output_b, "/");
 		strcat (path_output_b, basename(input));
-		printf("path_output_b:%s\n", path_output_b);
+
 		mkdir(path_output_b, 0777);
 		copy_perm(input, path_output_b);
 		if(opc.opt_v) printf("%s\n", path_output_b);
@@ -289,6 +296,7 @@ void copy_dir_to_dir(char * input, char * output){
   		if (origen_file[0] == '.') {continue;} // Se ignoran los archivos ocultos como . o ..
 
 		strcpy (path_output, path_output_b);
+
 		strcat (path_output, "/");
 		strcat (path_output, origen_file);
 		
@@ -324,7 +332,7 @@ void copy(char* array_input[MAX_ELEMENTOS], int num_files_in, char * output)
 		}
 		else { // El origen es un fichero
 			if(dest_type == 1){ // El destino es un directorio
-				char * path_output = (char *) malloc (1000 *sizeof (char));
+				char * path_output = (char *) malloc (200 *sizeof (char));
 				strcpy (path_output, output);
 				strcat (path_output, "/");
 				strcat (path_output, basename(input));
