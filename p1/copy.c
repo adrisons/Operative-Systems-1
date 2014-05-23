@@ -43,7 +43,6 @@ char* outputFile;
 int copiedBytes = 0;
 
 
-
 /**
 ** Comprueba si el segundo argumento empieza con el primero.
 **/
@@ -68,19 +67,16 @@ int ends_with(char *suc, char *str){
 ** Convierte un string a int
 ** Si no es posible, se devuelve un error
 **/
-int str_to_int(char * arg)
-{
+int str_to_int(char * arg) {
 
 	int aux = atoi(arg);
-	if (aux == 0)
-	{
+	if (aux == 0) {
 		printf("Error: El valor numBytes especificado para la opción -t no es válido.\n");
 		exit(0);
 	}
 
 	return aux;
 }
-
 
 
 void copy_perm(char *input, char *output){
@@ -91,9 +87,7 @@ void copy_perm(char *input, char *output){
 		exit(13);
 	}
 	chmod(output, info.st_mode);
-
 }
-
 
 
 /**
@@ -118,22 +112,17 @@ int get_path_type(char* target){
 		}
 	}
 
-	if(S_ISDIR(statbuf.st_mode))
-		// Es un directorio
+	if(S_ISDIR(statbuf.st_mode)) // Es un directorio
 		return 1;
-	else if(S_ISREG(statbuf.st_mode))
-		// Es un fichero
+	else if(S_ISREG(statbuf.st_mode)) // Es un fichero
 		return 2;
-	else if(S_ISLNK(statbuf.st_mode))
-		// Es un link
+	else if(S_ISLNK(statbuf.st_mode)) // Es un link
 		return 3;
-	else // Error
-	{
+	else { // Error 
 		printf("Error: Tipo de archivo incorecto %s.\n",target);
 		return 0;
 	} 
 }
-
 
 
 /**
@@ -159,7 +148,6 @@ int check_opt_t(char * o){
 }
 
 
-
 /**
 **
 ** No permite copiar un archivo sobre si mismo
@@ -178,7 +166,6 @@ void check_paths(char* input_path, char * output_path){
 	}
 
 	int orig_type = get_path_type(input_path);
-	
 	if((orig_type == 1) && (!opc.opt_R)){// Si el path origen es un directorio debe estar especificada la opción -R
 			printf("Error: Para copiar directorios debe estar activada la opción -R.\n");
 			exit(11);
@@ -206,6 +193,7 @@ FILE * open_file(char * path, char * options){
 	}
 	return f;
 }
+
 
 /**
 ** Copia un fichero a otro
@@ -258,20 +246,16 @@ void copy_file_to_file (char * input_path, char * output_path){
 	free(input_real_path);
 	copy_perm(input_path, output_path);
 	if(opc.opt_v) printf("%s\n", output_path);
-
 }
 
 
-
 void copy_dir_to_dir(char * input, char * output){
-
 	DIR * dir_origen;
 	struct dirent * inside_origen;
-	
-	char  path_input [PATH_MAX];//= (char *) malloc (1000 *sizeof (char));
-	char  path_input_b [PATH_MAX];//= (char *) malloc (1000 *sizeof (char)); // path carpeta origen
-	char  path_output [PATH_MAX];//= (char *) malloc (1000 *sizeof (char));
-	char  path_output_b [PATH_MAX];//= (char *) malloc (1000 *sizeof (char)); // path de la carpeta creada en el destino
+	char  path_input [PATH_MAX];
+	char  path_input_b [PATH_MAX];
+	char  path_output [PATH_MAX];
+	char  path_output_b [PATH_MAX];
 
 	check_paths(input, output);
 
@@ -282,9 +266,7 @@ void copy_dir_to_dir(char * input, char * output){
 
 		strcpy (path_input_b, input);
 		if(opc.opt_v) printf("%s\t --> ", path_input_b);
-		strcpy (path_output_b, output);
-		strcat (path_output_b, "/");
-		strcat (path_output_b, basename(input));
+		sprintf(path_output_b,"%s/%s", output, basename(input));
 
 		mkdir(path_output_b, 0777);
 		copy_perm(input, path_output_b);
@@ -292,17 +274,10 @@ void copy_dir_to_dir(char * input, char * output){
 
 	while ((inside_origen = readdir (dir_origen)) != NULL) {
 		char * origen_file = inside_origen -> d_name;
-
   		if (origen_file[0] == '.') {continue;} // Se ignoran los archivos ocultos como . o ..
 
-		strcpy (path_output, path_output_b);
-
-		strcat (path_output, "/");
-		strcat (path_output, origen_file);
-		
-		strcpy (path_input, path_input_b);
-		strcat (path_input, "/");
-		strcat (path_input, origen_file);
+		sprintf(path_output,"%s/%s", path_output_b, origen_file);
+		sprintf(path_input,"%s/%s", path_input_b, origen_file);
 
 		int file_type = get_path_type(path_input);
 		switch(file_type)
@@ -332,10 +307,9 @@ void copy(char* array_input[MAX_ELEMENTOS], int num_files_in, char * output)
 		}
 		else { // El origen es un fichero
 			if(dest_type == 1){ // El destino es un directorio
-				char * path_output = (char *) malloc (200 *sizeof (char));
-				strcpy (path_output, output);
-				strcat (path_output, "/");
-				strcat (path_output, basename(input));
+				char * path_output = (char *) malloc (PATH_MAX *sizeof (char));
+				sprintf(path_output,"%s/%s", output, basename(input));
+				
 				copy_file_to_file(input, path_output);
 				free(path_output);
 			}
@@ -345,7 +319,6 @@ void copy(char* array_input[MAX_ELEMENTOS], int num_files_in, char * output)
 		}
 	}
 }
-
 
 
 /**
@@ -378,7 +351,6 @@ void get_args(int argc, char *argv[]){
 		}
 		// RUTAS ORIGEN
 		else {
-
 			inputFiles.array[inputFiles.numFiles] = argi;
 			inputFiles.numFiles++;
 		}
@@ -406,6 +378,5 @@ int main(int argc, char *argv[])
 	get_args(argc, argv);
 	copy(&inputFiles.array[0], inputFiles.numFiles, outputFile);
 	printf("Bytes copiados: %d\n", copiedBytes);
-
 
 }
