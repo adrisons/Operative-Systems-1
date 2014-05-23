@@ -113,7 +113,7 @@ int get_path_type(char* target){
 		}
 		else{
 			printf("Error: Path incorrecto %s.\n",target);
-			exit(3);
+			exit(0);
 		}
 	}
 
@@ -188,6 +188,7 @@ void check_paths(char* input_path, char * output_path){
 		if( file != NULL ){
 			printf("Error: Ya existe %s. Para sobrescribir archivos debe estar la opción -f activada.\n", output_path);
 			fclose(file);
+			exit(0);
 		}			
 	}
 }
@@ -258,24 +259,26 @@ void copy_dir_to_dir(char * input, char * output){
 	DIR * dir_origen;
 	struct dirent * inside_origen;
 	
-	char * path_input = (char *) malloc (1000 *sizeof (char));
-	char * path_input_b = (char *) malloc (1000 *sizeof (char));
-	char * path_output = (char *) malloc (1000 *sizeof (char));
-	char * path_output_b = (char *) malloc (1000 *sizeof (char));
+	char  path_input [250];//= (char *) malloc (1000 *sizeof (char));
+	char  path_input_b [250];//= (char *) malloc (1000 *sizeof (char)); // path carpeta origen
+	char  path_output [250];//= (char *) malloc (1000 *sizeof (char));
+	char  path_output_b [250];//= (char *) malloc (1000 *sizeof (char)); // path de la carpeta creada en el destino
 
 	check_paths(input, output);
 
 	if ((dir_origen = opendir (input)) == NULL) {
 		printf("Error: No se ha podido abrir %s\n", input);
-		exit(13);
+		exit(0);
 	}
 
+		printf("input:%s\n", input);
+		printf("output:%s\n", output);
 		strcpy (path_input_b, input);
 		if(opc.opt_v) printf("%s\t --> ", path_input_b);
 		strcpy (path_output_b, output);
 		strcat (path_output_b, "/");
 		strcat (path_output_b, basename(input));
-
+		printf("path_output_b:%s\n", path_output_b);
 		mkdir(path_output_b, 0777);
 		copy_perm(input, path_output_b);
 		if(opc.opt_v) printf("%s\n", path_output_b);
@@ -320,7 +323,7 @@ void copy(char* array_input[MAX_ELEMENTOS], int num_files_in, char * output)
 			copy_dir_to_dir(input, output);
 		}
 		else { // El origen es un fichero
-			if(dest_type == 1){
+			if(dest_type == 1){ // El destino es un directorio
 				char * path_output = (char *) malloc (1000 *sizeof (char));
 				strcpy (path_output, output);
 				strcat (path_output, "/");
@@ -351,7 +354,7 @@ void get_args(int argc, char *argv[]){
 		if (starts_with("-", argi)){
 			if (strlen(argi) > 2) {
 				printf("Error: Opción no válida");
-				exit(1);
+				exit(0);
 			}
 			option = argi[1];
 			switch(option){
@@ -374,7 +377,7 @@ void get_args(int argc, char *argv[]){
 	}
 	if(inputFiles.numFiles == 0){
 		printf("Error: Es necesario especificar un origen a copiar.\n");
-		exit(13);
+		exit(0);
 	}
 }
 
