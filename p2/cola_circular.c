@@ -21,7 +21,7 @@ int isEmpty(tpCola pCola){
 }
 
 int isFull(tpCola pCola){
-	if((pCola->num) >= (pCola->maxNum -1))
+	if((pCola->num) >= (pCola->maxNum))
 		return 1;
 	return 0;
 }
@@ -58,8 +58,9 @@ int insert(tpCola pCola, itemType item){
 	if(isFull(pCola)) // Si está llena no se puede insertar
 		return 0;
 
-	pCola->final = next(pCola->final, pCola->maxNum); // Se avanza la última posición
-	pCola->items[pCola->final] = item; // Se inserta en la última posición
+	int fin = pCola->final;
+	pCola->items[fin] = item; // Se inserta en la última posición
+	pCola->final = next(fin, pCola->maxNum); // Se avanza la última posición
 	(pCola->num)++;
 
 	return 1;
@@ -69,28 +70,43 @@ int insert(tpCola pCola, itemType item){
 ** Imprime el contenido de la cola
 **/
 void print(tpCola pCola){
-	char * str;
-	int i = pCola->ppio;
-	int m = pCola->maxNum;
-	int f = pCola->final;
-	str = "[";
-	write (STDOUT_FILENO, str, strlen(str));
+	char* str = (char * ) malloc(50*sizeof(char*));	
+	int n = pCola->num;
+	int max = pCola->maxNum;
+	int numIt;
 	
-	while((i = next(i, m)) != f){
-		sprintf (str, "%c\n", pCola->items[i]);
-		write (STDOUT_FILENO, str, strlen(str));
-	}
-	str = "]\n";
+	sprintf (str, "[");
 	write (STDOUT_FILENO, str, strlen(str));
 
+	int i = pCola->ppio;
+	for(numIt = 0; numIt < n; numIt++){ // Para todos los elementos de la cola
+		sprintf (str, " %c", pCola->items[i]);
+		write (STDOUT_FILENO, str, strlen(str));
+		i = next(i,max);
+	}
+
+	sprintf (str, " ]\n");
+	write (STDOUT_FILENO, str, strlen(str));
+	free(str);
 }
 
 
 
 int main(){
-	tpCola pCola;
+	tpCola pCola = (tCola *) malloc(sizeof(tCola));
+	printf("initialize\n");
 	initialize(pCola, 4);
+
 	print(pCola);
+	printf("insert:\n");
+	insert(pCola,'A');
+	insert(pCola,'B');
+	insert(pCola,'C');
+	print(pCola);
+	printf("num=%d\n",pCola->num);
+	
+	
+	free(pCola);
 }
 
 
