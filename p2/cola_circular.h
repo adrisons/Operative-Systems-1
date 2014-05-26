@@ -17,7 +17,9 @@ struct cola {
 typedef struct cola tCola;
 typedef tCola * tpCola;
 
+void initialize(tpCola pCola, int tam); // Inicializa la cola con maxNum = tam
 int isEmpty(tpCola);
+int isFull(tpCola pCola);
 itemType get_head(tpCola); // Obtiene el primero de la cola
 int insert(tpCola, itemType); // Inserta item al final de la cola
 void print(tpCola); // Imprime el contenido de la cola

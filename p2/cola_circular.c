@@ -92,23 +92,6 @@ void print(tpCola pCola){
 
 
 
-int main(){
-	tpCola pCola = (tCola *) malloc(sizeof(tCola));
-	printf("initialize\n");
-	initialize(pCola, 4);
-
-	print(pCola);
-	printf("insert:\n");
-	insert(pCola,'A');
-	insert(pCola,'B');
-	insert(pCola,'C');
-	print(pCola);
-	printf("num=%d\n",pCola->num);
-	
-	
-	free(pCola);
-}
-
 
 
 
