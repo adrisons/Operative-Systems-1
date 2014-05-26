@@ -1,7 +1,7 @@
 #include "buffer.h"
 
 
-#define PATH_SHMEM "/tmp" // Path en donde se creará el área de memoria compartida
+#define PATH_SHBUF "/tmp" // Path en donde se creará el área de memoria compartida
 #define USR_ID 'B' // Identificador de usuario para obtener el área de memoria compartida
 
 /**
@@ -9,7 +9,7 @@
 * Si no existe, se crea y se obtiene el identificador.
 **/
 int get_buff_id(){
-	key_t key = ftok(PATH_SHMEM, USR_ID);
+	key_t key = ftok(PATH_SHBUF, USR_ID);
 	if((int)key == -1){
 		printf("Error [ftok]: el path no existe o no puede ser accedido por el proceso.\n");
 		exit(0);
