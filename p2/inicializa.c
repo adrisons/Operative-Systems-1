@@ -1,13 +1,32 @@
+/**
+*	Comando 'ipcs' para ver la memoria compartida del sistema y los semáforos
+**/
+
 #include "buffer.h"
 //#include "semaforo.h"
 
+
 int main(int argc, char **argv) {
 
-	tpBuffer pBuffer = get_buf();
-	initialize(pBuffer, MAX_ITEMS);
+	int num_items = 15;
+
+	if(argc == 3){
+		int aux = atoi(argv[2]);
+		if(aux < MAX_ITEMS && aux > 0)
+			num_items = aux;
+		else{
+			printf("Error: el número de items debe estar comprendido entre 0 y %d\n", MAX_ITEMS);
+			exit(0);
+		}
+	} else if (argc != 1) {
+		printf("Error: parámetros incorrectos\n");
+		exit(0);
+	}
+
+	tpBuffer pBuffer = get_buf(); // Se crea el área de memoria compartida
+	initialize(pBuffer, num_items); // Se inicializa
 
 	return 0;
-
 }
 
 /**

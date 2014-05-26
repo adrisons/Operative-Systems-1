@@ -93,16 +93,40 @@ void del_buff(){
 }
 
 
+/************************************************************************
 
 int main(){
 
-	get_buf();
-	printf("Buffer creado!\n");
+	pid_t child_pid, wpid;
+	int status = 0;
 
+	tpBuffer pBuffer = get_buf();
+	printf("[padre (pid = %d)] Buffer creado!\n", getpid());
+	leave_buff(pBuffer);
+	printf("[padre (pid = %d)] Se abandona el buffer.\n", getpid());
 	buff_status();
 
+	if ((child_pid = fork()) == 0) {
+		printf("[hijo (pid = %d)]-----BEGIN\n", getpid());
+		pBuffer = get_buf();
+		printf("[hijo (pid = %d)]\t Accede al buffer\n", getpid());
+		buff_status();
+		leave_buff(pBuffer);
+		printf("[hijo (pid = %d)]\t Abandona el buffer\n", getpid());
+		buff_status();
+		printf("[hijo (pid = %d)]-----END\n", getpid());
+		return 1;
+	}
+
+	while ((wpid = wait(&status)) > 0);
+	printf("[padre (pid = %d)] Sale de la espera\n", getpid());
+	buff_status();
 	del_buff();
-	printf("Buffer destruido!\n");
+	printf("[padre (pid = %d)] Buffer destruido!\n", getpid());
+	return 0;
 
 }
+
+************************************************************************/
+
 

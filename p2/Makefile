@@ -4,19 +4,22 @@ CC = gcc
 #Definiendo las opciones de compilacion
 CFLAGS= -Wall -O0 -g
 
-default: clean all
+default: clean compile
 
 help:
 	@echo "Usar:"
-	@echo "   all:     Compilar"
+	@echo "   compile:     Compilar"
 	@echo "   clean:   Eliminar ejecutables"
 	@echo "   tar:     Empaquetar"
 
-all: cola_circular.c buffer.c
+compile: cola_circular.c buffer.c
 	$(CC) $(CFLAGS) -c cola_circular.c
 	$(CC) $(CFLAGS) -c buffer.c
-	$(CC) $(CFLAGS) -o buffer buffer.o cola_circular.o
+	$(CC) $(CFLAGS) -c inicializa.c
+	$(CC) $(CFLAGS) -o inicializa inicializa.o buffer.o cola_circular.o
 	
+	$(CC) $(CFLAGS) -c finaliza.c
+	$(CC) $(CFLAGS) -o finaliza finaliza.o buffer.o cola_circular.o
 
 clean:
 	rm -f  *.o *.c.bak buffer inicializa productores consumidores finaliza

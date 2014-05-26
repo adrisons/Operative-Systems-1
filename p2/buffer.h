@@ -4,6 +4,7 @@
 #include <sys/shm.h>
 #include <time.h>
 #include <errno.h>
+#include <sys/wait.h>
 
 typedef struct cola tBuffer;
 typedef tBuffer * tpBuffer;
