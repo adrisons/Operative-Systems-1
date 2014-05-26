@@ -28,8 +28,8 @@ void del_item(int id_proc, tpBuffer pBuffer) {
 * cuando el proceso entra en la sección crítica
 **/
 void consume(int id_proc, int times, tpBuffer pBuffer, int semId){
-	
-	for (int i = 0; i < times; ++i)	{
+	int i;
+	for (i = 0; i < times; ++i)	{
 		P(semId, SEM_LLENO);
 		P(semId, SEM_MUTEX);
 		
@@ -48,14 +48,15 @@ void consume(int id_proc, int times, tpBuffer pBuffer, int semId){
 void get_args(int argc, char *argv[], int *num_proc, int *times){
 	char * argi;
 	char option;
-
+	int i;
+	
 	if(argc < 5){
 		printf("Sintaxis:\n");
 		printf("consumidores -c <Num procesos> -times <Num elementos/proceso>\n");
 		exit(0);
 	}
 
-	for (int i = 1; i < argc -1; i++) {
+	for (i = 1; i < argc -1; i++) {
 		argi = argv[i];
 		// OPCIONES
 		if ( argi[0] == '-'){

@@ -38,7 +38,8 @@ void add_item(int id_proc, char item, tpBuffer pBuffer) {
 **/
 void produce(int id_proc, int times, tpBuffer pBuffer, int semId){
 	char c;
-	for (int i = 0; i < times; ++i)	{
+	int i;
+	for (i = 0; i < times; ++i)	{
 		c = get_item(id_proc);
 		P(semId, SEM_VACIO);
 		P(semId, SEM_MUTEX);
@@ -57,6 +58,7 @@ void produce(int id_proc, int times, tpBuffer pBuffer, int semId){
 void get_args(int argc, char *argv[], int *num_proc, int *times){
 	char * argi;
 	char option;
+	int i;
 
 	if(argc < 5){
 		printf("Sintaxis:\n");
@@ -64,7 +66,7 @@ void get_args(int argc, char *argv[], int *num_proc, int *times){
 		exit(0);
 	}
 
-	for (int i = 1; i < argc -1; i++) {
+	for (i = 1; i < argc -1; i++) {
 		argi = argv[i];
 		// OPCIONES
 		if ( argi[0] == '-'){

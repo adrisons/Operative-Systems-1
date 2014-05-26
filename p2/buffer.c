@@ -55,11 +55,11 @@ void buff_status(){
 		printf("\tshm_perm.cuid = %d\n", buf->shm_perm.cuid);
 		printf("\tshm_perm.cgid = %d\n", buf->shm_perm.cgid);
 		printf("\tshm_perm.mode = %#o\n", buf->shm_perm.mode);
-		printf("\tshm_perm.key = %#x\n", buf->shm_perm._key);
+		printf("\tshm_perm.key = %#x\n", buf->shm_perm.__key);
 		printf("\tshm_segsz = %d\n",(int) buf->shm_segsz);
 		printf("\tshm_lpid = %d\n", buf->shm_lpid);
 		printf("\tshm_cpid = %d\n", buf->shm_cpid);
-		printf("\tshm_nattch = %d\n", buf->shm_nattch);
+		printf("\tshm_nattch = %d\n",(int) buf->shm_nattch);
 		printf("\tshm_atime = %s", buf->shm_atime ? ctime(&buf->shm_atime) : "Not Set\n");
 		printf("\tshm_dtime = %s", buf->shm_dtime ? ctime(&buf->shm_dtime) : "Not Set\n");
 		printf("\tshm_ctime = %s", ctime(&buf->shm_ctime));
