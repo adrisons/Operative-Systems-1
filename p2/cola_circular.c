@@ -1,10 +1,12 @@
 
 #include "cola_circular.h"
-
+#define MAXCADENA 200
+char mensaje [MAXCADENA];
 
 void initialize(tpCola pCola, int tam){
 	if(tam > MAX_ITEMS){
-		printf("El tamaño de la cola (%d) no puede superar el máximo (%d)\n", tam, MAX_ITEMS);
+		sprintf(mensaje, "El tamaño de la cola (%d) no puede superar el máximo (%d)\n", tam, MAX_ITEMS);
+		write (STDOUT_FILENO, mensaje, strlen(mensaje));
 		exit(0);
 	}
 	pCola->maxNum = tam;
@@ -37,7 +39,8 @@ int next (int pos, int max){
 **/
 itemType get_head(tpCola pCola){
 	if(isEmpty(pCola)){
-		printf("Error: la cola está vacía.\n");
+		sprintf(mensaje, "Error: la cola está vacía.\n");
+		write (STDOUT_FILENO, mensaje, strlen(mensaje));
 		exit(0);
 	}
 
@@ -89,11 +92,3 @@ void print(tpCola pCola){
 	write (STDOUT_FILENO, str, strlen(str));
 	free(str);
 }
-
-
-
-
-
-
-
-

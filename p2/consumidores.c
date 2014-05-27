@@ -1,12 +1,13 @@
 #include "buffer.h"
 #include "semaforo.h"
 
-#define MAXCADENA 100
+#define MAXCADENA 200
+char mensaje [MAXCADENA];
+
 /**
 * Obtiene y borra el último item del buffer
 **/
 void del_item(int id_proc, tpBuffer pBuffer) {
-	char mensaje [MAXCADENA];
 	time_t t = time(NULL);
 	pid_t p = getpid();
 	sprintf (mensaje, "productor %d (%u): Comienzo borrar item a las %s", id_proc, p, ctime(&t));
@@ -51,8 +52,8 @@ void get_args(int argc, char *argv[], int *num_proc, int *times){
 	int i;
 	
 	if(argc < 5){
-		printf("Sintaxis:\n");
-		printf("consumidores -c <Num procesos> -times <Num elementos/proceso>\n");
+		sprintf(mensaje, "Sintaxis:\nconsumidores -c <Num procesos> -times <Num elementos/proceso>\n");
+		write (STDOUT_FILENO, mensaje, strlen(mensaje));
 		exit(0);
 	}
 
@@ -67,7 +68,8 @@ void get_args(int argc, char *argv[], int *num_proc, int *times){
 			option = argi[1];
 			switch(option){
 				case 'c': *num_proc = atoi(argv[i+1]); i++; break;
-				default: printf("Error: Opción no reconocida \"%s\"\n", argi); exit(1);
+				default: sprintf(mensaje,"Error: Opción no reconocida \"%s\"\n", argi); 
+				write (STDOUT_FILENO, mensaje, strlen(mensaje)); exit(1);
 			}
 		}
 	}
@@ -89,25 +91,30 @@ int main(int argc, char *argv[]) {
 
 	get_args(argc, argv, &np, &times);
 	
-	printf("[padre (pid = %d)] BEGIN \n", getpid());
-	
+	sprintf(mensaje, "[padre (pid = %d)] BEGIN \n", getpid());
+	write (STDOUT_FILENO, mensaje, strlen(mensaje));
+
 	for (i=0; i<np; i++){
 		if ((pid = fork()) == 0){ // hijo
 			id_proc = i;
-			printf("[hijo (pid = %d)]\t EMPIEZA\n", getpid());
+			sprintf(mensaje, "[hijo (pid = %d)]\t EMPIEZA\n", getpid());
+			write (STDOUT_FILENO, mensaje, strlen(mensaje));
+
 			pBuffer = get_buf();
 			semId = get_sem();
 			
 			consume (id_proc, times, pBuffer, semId);
 
 			leave_buff(pBuffer);
-			printf("[hijo (pid = %d)]\t ACABA\n", getpid());
+			sprintf(mensaje, "[hijo (pid = %d)]\t ACABA\n", getpid());
+			write (STDOUT_FILENO, mensaje, strlen(mensaje));
 			return 1;
 		}
 	}
 	
 	while ((wpid = wait(&status)) > 0);
-	printf("[padre (pid = %d)] Sale de la espera\n", getpid());
+	sprintf(mensaje, "[padre (pid = %d)] Sale de la espera\n", getpid());
+	write (STDOUT_FILENO, mensaje, strlen(mensaje));
 	
 
 	return 0;

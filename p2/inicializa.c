@@ -5,6 +5,8 @@
 #include "buffer.h"
 #include "semaforo.h"
 
+#define MAXCADENA 200
+char mensaje [MAXCADENA];
 
 int main(int argc, char **argv) {
 
@@ -15,23 +17,31 @@ int main(int argc, char **argv) {
 		if(aux < MAX_ITEMS && aux > 0)
 			num_items = aux;
 		else{
-			printf("Error: el número de items debe estar comprendido entre 0 y %d\n", MAX_ITEMS);
+			sprintf(mensaje, "Error: el número de items debe estar comprendido entre 0 y %d\n", MAX_ITEMS);
+			write (STDOUT_FILENO, mensaje, strlen(mensaje));
+
 			exit(0);
 		}
 	} else if (argc != 1) {
-		printf("Error: parámetros incorrectos\n");
+		sprintf(mensaje, "Usage: inicializa [-items] [num_items]\n");
+		write (STDOUT_FILENO, mensaje, strlen(mensaje));
+
 		exit(0);
 	}
 
 	tpBuffer pBuffer = get_buf(); // Se crea el área de memoria compartida
-	printf("[padre (pid = %d)] Buffer creado!\n", getpid());
+	sprintf(mensaje, "[padre (pid = %d)] Buffer creado!\n", getpid());
+	write (STDOUT_FILENO, mensaje, strlen(mensaje));
+	
 	initialize(pBuffer, num_items); // Se inicializa
 
 	int semId = get_sem(); // Se crean los semáforos
 	set_sem_value (semId, SEM_VACIO, num_items);
 	set_sem_value (semId, SEM_MUTEX, 1);
 	set_sem_value (semId, SEM_LLENO, 0);
-	printf("[padre (pid = %d)] Semáforo creado!\n", getpid());
+
+	sprintf(mensaje, "[padre (pid = %d)] Semáforo creado!\n", getpid());
+	write (STDOUT_FILENO, mensaje, strlen(mensaje));
 	return 0;
 }
 

@@ -3,6 +3,8 @@
 
 #define PATH_SHBUF "/tmp" // Path en donde se creará el área de memoria compartida
 #define USR_ID 'B' // Identificador de usuario para obtener el área de memoria compartida
+#define MAXCADENA 200
+char mensaje [MAXCADENA];
 
 /**
 * Obtiene el identificador del área de memoria compartida.
@@ -11,12 +13,15 @@
 int get_buff_id(){
 	key_t key = ftok(PATH_SHBUF, USR_ID);
 	if((int)key == -1){
-		printf("Error [ftok]: el path no existe o no puede ser accedido por el proceso.\n");
+		sprintf (mensaje, "Error [ftok]: el path [%s] no existe o no puede ser accedido por el proceso.\n", PATH_SHBUF);
+		write (STDOUT_FILENO, mensaje, strlen(mensaje));
 		exit(0);
 	}
 	int shmid = shmget(key, sizeof(tBuffer), IPC_CREAT | 0666); //IPC_CREAT: Create the shared memory segment if it does not exist.
 	if(shmid == -1){
-		printf("Error [shmget]: al obtener el identificador de la memoria compartida.\n");
+		
+		sprintf (mensaje, "Error [shmget]: al obtener el identificador de la memoria compartida.\n");
+		write (STDOUT_FILENO, mensaje, strlen(mensaje));
 		exit(0);
 	}
 
@@ -31,7 +36,8 @@ tpBuffer get_buf(){
 	tpBuffer pBuffer;
 	pBuffer = (tpBuffer) shmat(shmid, 0, 0);
 	if(pBuffer == (tpBuffer)-1){
-		printf("Error shmat\n");
+		sprintf (mensaje, "Error shmat. -> ~/buffer.c/get_buf/shmat\n");
+		write (STDOUT_FILENO, mensaje, strlen(mensaje));
 		exit(0);
 	}
 	return pBuffer;
@@ -45,7 +51,8 @@ void buff_status(){
 	int shmid = get_buff_id();
 	struct shmid_ds *buf = (void*) malloc(sizeof(struct shmid_ds));
 	if(shmctl(shmid, IPC_STAT, buf) == -1){
-		printf("Error al mostrar estado.[errno=%d]\n", errno);
+		sprintf (mensaje, "Error al mostrar estado.[errno=%d]\n", errno);
+		write (STDOUT_FILENO, mensaje, strlen(mensaje));
 		
 	}else{
 		/* Print the current status. */
@@ -55,7 +62,7 @@ void buff_status(){
 		printf("\tshm_perm.cuid = %d\n", buf->shm_perm.cuid);
 		printf("\tshm_perm.cgid = %d\n", buf->shm_perm.cgid);
 		printf("\tshm_perm.mode = %#o\n", buf->shm_perm.mode);
-		printf("\tshm_perm.key = %#x\n", buf->shm_perm.__key);
+//		printf("\tshm_perm.key = %#x\n", buf->shm_perm.__key);
 		printf("\tshm_segsz = %d\n",(int) buf->shm_segsz);
 		printf("\tshm_lpid = %d\n", buf->shm_lpid);
 		printf("\tshm_cpid = %d\n", buf->shm_cpid);
@@ -74,7 +81,8 @@ void buff_status(){
 **/
 void leave_buff(tpBuffer pBuffer){
 	if( shmdt(pBuffer) == -1){
-		printf("Error: al desasignar el puntero al buffer.\n");
+		sprintf(mensaje,"Error: al desasignar el puntero al buffer.\n");
+		write (STDOUT_FILENO, mensaje, strlen(mensaje));
 		exit(0);
 	}
 }
@@ -86,10 +94,10 @@ void leave_buff(tpBuffer pBuffer){
 void del_buff(){
 	int shmid = get_buff_id();
 	if( shmctl(shmid, IPC_RMID, NULL) == -1){
-		printf("Error: al borrar el buffer.\n");
+		sprintf(mensaje,"Error: al borrar el buffer.\n");
+		write (STDOUT_FILENO, mensaje, strlen(mensaje));
 		exit(0);
 	}
-
 }
 
 
