@@ -1,4 +1,4 @@
-#include "sem.h"
+#include "semaforo.h"
 
 /**
 * Obtiene el identificador del área de memoria compartida.
@@ -46,7 +46,7 @@ void sem_op(int semId, int semnum, int op){
 	op_buf[0].sem_flg = 0; /* Permite que se produzca un wait */
 	
 	if (semop(semId, op_buf, 1) == -1) {
-		printf("Error [semop]: al modificar el semáforo %d.\n", semnum);
+		printf("Error [semop]: al modificar el semáforo %d [pid=%d].\n", semnum, getpid());
 		exit(0);
 	}
 }

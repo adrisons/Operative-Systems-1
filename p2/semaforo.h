@@ -3,6 +3,7 @@
 #include <sys/sem.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #define NUM_SEM 3
 #define SEM_VACIO 0

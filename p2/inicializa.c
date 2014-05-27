@@ -3,14 +3,14 @@
 **/
 
 #include "buffer.h"
-//#include "semaforo.h"
+#include "semaforo.h"
 
 
 int main(int argc, char **argv) {
 
 	int num_items = 15;
 
-	if(argc == 3){
+	if((argc == 3 && (strcmp("-items", argv[1]) == 0))){
 		int aux = atoi(argv[2]);
 		if(aux < MAX_ITEMS && aux > 0)
 			num_items = aux;
@@ -24,8 +24,14 @@ int main(int argc, char **argv) {
 	}
 
 	tpBuffer pBuffer = get_buf(); // Se crea el área de memoria compartida
+	printf("[padre (pid = %d)] Buffer creado!\n", getpid());
 	initialize(pBuffer, num_items); // Se inicializa
 
+	int semId = get_sem(); // Se crean los semáforos
+	set_sem_value (semId, SEM_VACIO, num_items);
+	set_sem_value (semId, SEM_MUTEX, 1);
+	set_sem_value (semId, SEM_LLENO, 0);
+	printf("[padre (pid = %d)] Semáforo creado!\n", getpid());
 	return 0;
 }
 
