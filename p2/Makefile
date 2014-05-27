@@ -32,6 +32,6 @@ compile: cola_circular.c buffer.c
 clean:
 	rm -f  *.o *.c.bak buffer inicializa productores consumidores finaliza
 
-tar: buffer.c sem.c inicializa.c productores.c consumidores.c finaliza.c
-	tar czvf p2.tar.gz *.c *.h Makefile README
+tar: cola_circular.c buffer.c semaforo.c inicializa.c productores.c consumidores.c finaliza.c
+	tar czvf p2.tar.gz *.c *.h Makefile
 	
